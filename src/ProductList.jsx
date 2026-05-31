@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { addItem } from './CartSlice';
 import './ProductList.css';
 import CartItem from './CartItem';
@@ -10,6 +10,12 @@ function ProductList({ onHomeClick }) {
     const [addedToCart, setAddedToCart] = useState({}); // State to track added products
     
     const dispatch = useDispatch(); // Initialize useDispatch
+    const cartItems = useSelector(state => state.cart.items); // Retrieve cart items from Redux store
+
+    // Calculate the total quantity of all items in the cart dynamically
+    const calculateTotalQuantity = () => {
+        return cartItems ? cartItems.reduce((total, item) => total + item.quantity, 0) : 0;
+    };
 
     const plantsArray = [
         {
@@ -225,7 +231,7 @@ function ProductList({ onHomeClick }) {
         padding: '15px',
         display: 'flex',
         justifyContent: 'space-between',
-        alignIems: 'center',
+        alignItems: 'center',
         fontSize: '20px',
     }
     const styleObjUl = {
@@ -247,13 +253,13 @@ function ProductList({ onHomeClick }) {
 
     const handleCartClick = (e) => {
         e.preventDefault();
-        setShowCart(true); // Set showCart to true when cart icon is clicked
+        setShowCart(true); 
     };
 
     const handlePlantsClick = (e) => {
         e.preventDefault();
-        setShowPlants(true); // Set showAboutUs to true when "About Us" link is clicked
-        setShowCart(false); // Hide the cart when navigating to About Us
+        setShowPlants(true); 
+        setShowCart(false); 
     };
 
     const handleContinueShopping = (e) => {
@@ -261,12 +267,11 @@ function ProductList({ onHomeClick }) {
         setShowCart(false);
     };
 
-    // Function to handle adding a plant to the cart
     const handleAddToCart = (product) => {
-        dispatch(addItem(product)); // Dispatch Redux action
+        dispatch(addItem(product)); 
         setAddedToCart((prevState) => ({
             ...prevState,
-            [product.name]: true, // Mark this specific product as added
+            [product.name]: true, 
         }));
     };
 
@@ -289,6 +294,7 @@ function ProductList({ onHomeClick }) {
                     <div> 
                         <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}>
                             <h1 className='cart'>
+                                <span className='cart_quantity_count'>{calculateTotalQuantity()}</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68">
                                     <rect width="156" height="156" fill="none"></rect>
                                     <circle cx="80" cy="216" r="12"></circle>
@@ -303,7 +309,6 @@ function ProductList({ onHomeClick }) {
             
             {!showCart ? (
                 <div className="product-grid">
-                    {/* Render the plants here */}
                     {plantsArray.map((category, index) => (
                         <div key={index}>
                             <h1><div>{category.category}</div></h1>
@@ -319,7 +324,6 @@ function ProductList({ onHomeClick }) {
                                         <div className="product-description">{plant.description}</div>
                                         <div className="product-cost">{plant.cost}</div>
                                         
-                                        {/* Add to Cart button with dynamic text and disabled state */}
                                         <button
                                             className="product-button"
                                             onClick={() => handleAddToCart(plant)}
